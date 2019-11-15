@@ -1,0 +1,15 @@
+#include <Arduino.h>
+
+#ifndef BUTTON_H
+#define BUTTON_H
+class Button
+{
+    private:
+        const int _BUTTONPIN;
+    public:
+        Button(const int BUTTONPIN);
+        buttonOn();
+        buttonOff();
+};
+
+#endif
