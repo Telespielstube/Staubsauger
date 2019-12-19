@@ -4,17 +4,16 @@
 #define BUTTON_H
 class Button
 {
-    private:
-        const int _BUTTONPIN;
-        int _previousState;
-        int _currentState;
-        unsigned long _firstTimestamp;
-        unsigned long _secondTimestamp;
+  private:
+    int _buttonPin;
+    int _lcdState = LOW;
+    int _previousState;
+    int _currentState = HIGH;
+    
+  public:
+    Button(const int buttonPin);
+    int read();
 
-    public:
-        Button(const int BUTTONPIN);
-        read();
-        pressed();
 };
 
 #endif

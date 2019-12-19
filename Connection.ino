@@ -2,14 +2,14 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-Connection::Connection(const char *SSID, const char *PASSWORD, const char *MQTTSERVER, int MQTTPORT, char *MQTTUSER, char *MQTTPASSWORD, WiFiClient *wifiClient, PubSubClient *subClient)
+Connection::Connection(char const *ssid, char const *password, char const *mqttServer, int mqttPort, char *mqttUser, char const *mqttPassword, WiFiClient &wifiClient, PubSubClient &subClient)
 {
-  _SSID = SSID;
-  _PASSWORD = PASSWORD;
-  _MQTTSERVER = MQTTSERVER;
-  _MQTTPORT = MQTTPORT;
-  _MQTTUSER = MQTTUSER;
-  _MQTTPASSWORD = MQTTPASSWORD;
+  _ssid = ssid;
+  _password = password;
+  _mqttServer = mqttServer;
+  _mqttPort = mqttPort;
+  _mqttUser = mqttUser;
+  _mqttPassword = mqttPassword;
   _wifiClient = wifiClient;
   _subClient = subClient;
 }
@@ -18,8 +18,9 @@ Connection::Connection(const char *SSID, const char *PASSWORD, const char *MQTTS
 void Connection::connectToWifi()
 {
   Serial.print("Trying to connect to network: ");
-  Serial.println(_SSID);
-  WiFi.begin(_SSID, _PASSWORD);
+  Serial.println(_ssid);
+  WiFi.begin(_ssid, _password);
+
   while (WiFi.status() != WL_CONNECTED)
   {
     Serial.print('.');
@@ -33,25 +34,25 @@ void Connection::connectToWifi()
 }
 
 void Connection::connectToBroker()
-{ 
-  if (_subClient->connected())
+{
+  if (_subClient.connected())
   {
     return;
   }
-  
+
   String clientId = "Staubfaenger";
   clientId += String(random(0xffff), HEX);
-  _subClient->setServer(_MQTTSERVER, _MQTTPORT);
+  _subClient.setServer(_mqttServer, _mqttPort);
   Serial.println("Connecting to MQTT broker");
-  while (!_subClient->connected())
+  while (!_subClient.connected())
   {
-    
-    if (_subClient->connect(clientId.c_str(), MQTTUSER, MQTTPASSWORD))
+
+    if (_subClient.connect(clientId.c_str(), mqttUser, mqttPassword))
     {
       Serial.println(clientId + " is connected");
     } else
     {
-      Serial.print("Could not connect. " + _subClient->state());
+      Serial.print("Could not connect. " + _subClient.state());
     }
   }
 }
