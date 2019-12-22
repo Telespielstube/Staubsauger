@@ -1,5 +1,4 @@
 /** Implements subscriber client of an MQTT infrastructure.
-
 */
 #include "Connection.h"
 #include "Button.h"
@@ -18,7 +17,8 @@ int mqttPort = 1883;
 char *mqttUser = "telespielstube";
 char const *mqttPassword = "12345";
 char const *topicDht11 = "/home/backyard/dht11";
-char const *topicSds11 = "/home/backyard/sds11";
+char const *topicSds11 = "/home/backyard/#";
+int buttonState = HIGH;
 
 WiFiClient wifiClient;
 PubSubClient subClient(wifiClient);
@@ -40,36 +40,28 @@ void setup()
 }
 
 // Function to get the message and print it on lcd.
-char callback(char *topic, byte *payload, int const messageLength)
+void callback(char *topic, byte *payload, int const messageLength)
 {
   lcd.clear();
-  char values[10];
+  if (!((strcmp(topic, "/home/backyard/sds11") == 0 && buttonState == LOW) ||
+        (strcmp(topic, "/home/backyard/dht11") == 0 && buttonState == HIGH))){
+      return;
+  }
+  if (strcmp(topic, "/home/backyard/sds11") == 0 && buttonState == HIGH)
+  {
+      return;
+  }
+  if (strcmp(topic, "/home/backyard/dht11") == 0 && buttonState == LOW)
+  {
+      return;
+  }    
+  char values[9];
   for (int i = 0; i < messageLength; ++i)
   {
     values[i] = payload[i];
   }
   char *token;
-  if (strcmp(topic, "/home/backyard/dht11") == 0)
-  {   
-    token = strtok(values, ",");
-    parser.showTemperature(token);
-    while (token != NULL)
-    {
-      token = strtok(NULL, ",");
-      parser.showHumidity(token);
-    }
-  }
-  if (strcmp(topic, "/home/backyard/sds11") == 0)
-  {
-    //parser.splitCharArray(token, values, topic);
-    token = strtok(values, ",");
-    parser.showPm10(token);
-    while (token != NULL)
-    {
-      token = strtok(NULL, ",");
-      parser.showPm25(token);
-    }
-  }
+  parser.splitCharArray(token, values, topic);
 }
 
 void loop()
@@ -82,11 +74,6 @@ void loop()
     connection.connectToBroker();
   }
   subClient.loop();
-  if (button.read()  == HIGH)
-  {
-    subClient.subscribe(topicDht11);
-  } else
-  {
-    subClient.subscribe(topicSds11);
-  }
+  buttonState = button.read();
+  subClient.subscribe(topicSds11);
 }

@@ -11,6 +11,7 @@ Button::Button(int buttonPin)
 int Button::read()
 {
   _currentState = digitalRead(_buttonPin);
+
   if (_currentState != _previousState && _currentState == HIGH)
   {  
     if (_lcdState == HIGH) 
@@ -19,7 +20,8 @@ int Button::read()
     } else {
       _lcdState = HIGH;
     }
-  _previousState = _currentState;
   }
+    _previousState = _currentState;
+
   return _lcdState;
 }
