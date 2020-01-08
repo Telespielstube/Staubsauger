@@ -2,8 +2,8 @@
 
 #ifndef BUTTON_H
 #define BUTTON_H
-class Button
-{
+
+class Button {
   private:
     int _buttonPin;
     int _lcdState = LOW;
@@ -13,7 +13,6 @@ class Button
   public:
     Button(const int buttonPin);
     int read();
-
 };
 
 #endif
