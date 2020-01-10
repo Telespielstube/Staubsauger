@@ -18,8 +18,23 @@ class Connection {
     PubSubClient *_subClient;
 
   public:
+    /* Constructor to create a Connection object.
+     *  
+     *  @param *ssid          network name.
+     *  @param *password      network password.
+     *  @param *mqttServer    broker ip address. 
+     *  @param *mqttPort      port the broker listens on. 
+     *  @param *mqttUser      user name.
+     *  @param *mqttPassword  user password.
+     *  @param *wifiClient    Wifi client object.
+     *  @param *pubClient     PubSubClient object.
+     */
     Connection(char const *ssid, char const *password, char const *mqttServer, int mqttPort, char *mqttUser, char const *mqttPassword, WiFiClient *wifiClient, PubSubClient *subClient);
+    /* Connects publisher to the wifi network.
+     */
     void connectToWifi();
+    /* Connects publisher to the brroker.
+     */
     bool connectToBroker();
 };
 #endif

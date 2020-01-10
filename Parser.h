@@ -8,7 +8,11 @@ class Parser {
     //
     
   public:
-    void splitCharArray(char *token, char values[], char *topic);
-    void readValues(char *token, char values[], char *topic, char** value1, char** value2);
+    /* Splits the message payload in two substrings.
+     *  
+     *  @param values[]   message payload 
+     *  @param **value1   pointer to values array to access 
+     */
+    void readValues(char values[], char **value1, char **value2);
 };
 #endif

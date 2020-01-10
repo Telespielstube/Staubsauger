@@ -1,4 +1,4 @@
-/** Implements subscriber client of an MQTT infrastructure.
+/** Implements subscriber client of an MQTT infrastructure. 
 */
 #include "Connection.h"
 #include "Button.h"
@@ -9,12 +9,17 @@
 #include <PubSubClient.h>
 
 int buttonPin = D0;
+//Wifi credentials
 char const *ssid = "iPhone";
 char const *password = "mqttProject";
+
+// Broker credentials
 char const *mqttServer = "broker.hivemq.com";
 int mqttPort = 1883;
 char *mqttUser = "telespielstube";
 char const *mqttPassword = "12345";
+
+// MQTT topic
 char const *allTopics = "/home/backyard/#";
 char *temperature = "0.0";
 char *humidity = "0.0";
@@ -31,6 +36,9 @@ Button button(buttonPin);
 Parser parser;
 Display display;
 
+/* Initializes and sets the initial values
+ * 
+ */
 void setup() {
   lcd.begin(16, 2);
   Serial.begin(115200);
@@ -41,11 +49,15 @@ void setup() {
   subClient.setCallback(callback);
 }
 
-// Function to fetch messges from broker.
+/* Function to fetch messges from broker.
+ *  
+ *  @param topic          topic of the received message. 
+ *  @param payload        content of the received message.
+ *  @param messageLength  character length of the message.
+ */
 void callback(char *topic, byte *payload, int const messageLength) {
   lcd.clear();
   char values[9];
-  char *token;
   for (int i = 0; i < messageLength; ++i) {
     values[i] = payload[i];
   }
@@ -53,24 +65,25 @@ void callback(char *topic, byte *payload, int const messageLength) {
       return;
   }
   if (strcmp(topic, "/home/backyard/sds11") == 0) {
-      parser.readValues(token, values, topic, &PM10, &PM25);
+      parser.readValues(values, &PM10, &PM25);
       if (buttonState == HIGH)
           return;
   }
   if (strcmp(topic, "/home/backyard/dht11") == 0) {
-      parser.readValues(token, values, topic, &temperature, &humidity);
+      parser.readValues(values, &temperature, &humidity);
       if (buttonState == LOW)
           return;          
   }    
 }
 
+/* Function to loop consecutively and allows the application to act and respond.
+ */
 void loop() {
   if (WiFi.status() != WL_CONNECTED) {
     connection.connectToWifi();
   } else if (!subClient.connected()) {
-    if (connection.connectToBroker())
-    {
-        subClient.subscribe(allTopics);
+    if (connection.connectToBroker()) {
+        subClient.subscribe(allTopics, 0);
     }
   }
   subClient.loop();
