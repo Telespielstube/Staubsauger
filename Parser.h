@@ -9,6 +9,6 @@ class Parser {
     
   public:
     void splitCharArray(char *token, char values[], char *topic);
-    void readValues(char *token, char values[], char *topic, char** value1, char** value2);
+    void readValues(char values[], char **value1, char **value2);
 };
 #endif

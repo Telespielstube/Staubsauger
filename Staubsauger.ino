@@ -36,7 +36,7 @@ void setup() {
   Serial.begin(115200);
   connection.connectToWifi();
   if (connection.connectToBroker()) {
-      subClient.subscribe(allTopics);
+      subClient.subscribe(allTopics, 0);
   }
   subClient.setCallback(callback);
 }
@@ -53,14 +53,18 @@ void callback(char *topic, byte *payload, int const messageLength) {
       return;
   }
   if (strcmp(topic, "/home/backyard/sds11") == 0) {
-      parser.readValues(token, values, topic, &PM10, &PM25);
-      if (buttonState == HIGH)
+      parser.readValues(values, &PM10, &PM25);
+      if (buttonState == HIGH) {
+          display.showFineDust(PM10, PM25);
           return;
+      }
   }
   if (strcmp(topic, "/home/backyard/dht11") == 0) {
-      parser.readValues(token, values, topic, &temperature, &humidity);
-      if (buttonState == LOW)
+      parser.readValues(values, &temperature, &humidity);
+      if (buttonState == LOW) {
+          display.showTemperature(temperature, humidity);
           return;          
+      }
   }    
 }
 
@@ -70,15 +74,17 @@ void loop() {
   } else if (!subClient.connected()) {
     if (connection.connectToBroker())
     {
-        subClient.subscribe(allTopics);
+        subClient.subscribe(allTopics, 0);
     }
   }
   subClient.loop();
   int oldButtonState = buttonState;
   buttonState = button.read();
+  if (buttonState != oldButtonState) {
     if (buttonState == HIGH) {
         display.showFineDust(PM10, PM25);
     } else {
         display.showTemperature(temperature, humidity);
     }
+  }
 }
