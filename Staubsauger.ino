@@ -1,4 +1,4 @@
-/** Implements subscriber client of an MQTT infrastructure. 
+/** Implements subscriber client of an MQTT infrastructure.
 */
 #include "Connection.h"
 #include "Button.h"
@@ -9,17 +9,12 @@
 #include <PubSubClient.h>
 
 int buttonPin = D0;
-//Wifi credentials
 char const *ssid = "iPhone";
 char const *password = "mqttProject";
-
-// Broker credentials
 char const *mqttServer = "broker.hivemq.com";
 int mqttPort = 1883;
 char *mqttUser = "telespielstube";
 char const *mqttPassword = "12345";
-
-// MQTT topic
 char const *allTopics = "/home/backyard/#";
 char *temperature = "0.0";
 char *humidity = "0.0";
@@ -29,16 +24,13 @@ int buttonState = HIGH;
 
 WiFiClient wifiClient;
 PubSubClient subClient(wifiClient);
-//LiquidCrystal lcd(D5, D6, D1, D2, D3, D4);
-LiquidCrystal lcd(14, 12, 5, 4, 0, 2);
+LiquidCrystal lcd(D5, D6, D1, D2, D3, D4);
+//LiquidCrystal lcd(14, 12, 5, 4, 0, 2);
 Connection connection(ssid, password, mqttServer, mqttPort, mqttUser, mqttPassword, &wifiClient, &subClient);
 Button button(buttonPin);
 Parser parser;
 Display display;
 
-/* Initializes and sets the initial values
- * 
- */
 void setup() {
   lcd.begin(16, 2);
   Serial.begin(115200);
@@ -49,15 +41,11 @@ void setup() {
   subClient.setCallback(callback);
 }
 
-/* Function to fetch messges from broker.
- *  
- *  @param topic          topic of the received message. 
- *  @param payload        content of the received message.
- *  @param messageLength  character length of the message.
- */
+// Function to fetch messges from broker.
 void callback(char *topic, byte *payload, int const messageLength) {
   lcd.clear();
   char values[9];
+  char *token;
   for (int i = 0; i < messageLength; ++i) {
     values[i] = payload[i];
   }
@@ -66,32 +54,37 @@ void callback(char *topic, byte *payload, int const messageLength) {
   }
   if (strcmp(topic, "/home/backyard/sds11") == 0) {
       parser.readValues(values, &PM10, &PM25);
-      if (buttonState == HIGH)
+      if (buttonState == HIGH) {
+          display.showFineDust(PM10, PM25);
           return;
+      }
   }
   if (strcmp(topic, "/home/backyard/dht11") == 0) {
       parser.readValues(values, &temperature, &humidity);
-      if (buttonState == LOW)
+      if (buttonState == LOW) {
+          display.showTemperature(temperature, humidity);
           return;          
+      }
   }    
 }
 
-/* Function to loop consecutively and allows the application to act and respond.
- */
 void loop() {
   if (WiFi.status() != WL_CONNECTED) {
     connection.connectToWifi();
   } else if (!subClient.connected()) {
-    if (connection.connectToBroker()) {
-        subClient.subscribe(allTopics, 0);
+    if (connection.connectToBroker())
+    {
+        subClient.subscribe(allTopics);
     }
   }
   subClient.loop();
   int oldButtonState = buttonState;
   buttonState = button.read();
+  if (buttonState != oldButtonState) {
     if (buttonState == HIGH) {
         display.showFineDust(PM10, PM25);
     } else {
         display.showTemperature(temperature, humidity);
     }
+  }
 }
