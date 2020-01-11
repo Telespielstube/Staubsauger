@@ -12,15 +12,21 @@ void Display::showTemperature(char *temperature, char *humidity) {
   lcd.print(humidity);
   lcd.print(" %");
 }
-void Display::showFineDust(char *pm10, char *pm25) {
+void Display::showFineDust(char *PM10, char *PM25) {
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("PM10: ");
-  lcd.print(pm10);
+  lcd.print(PM10);
   lcd.print(" um");
 
   lcd.setCursor(0, 1);
   lcd.print("PM25: ");
-  lcd.print(pm25);
+  lcd.print(PM25);
   lcd.print(" um");  
+}
+
+void Display::showError(char *error) {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print(error);
 }

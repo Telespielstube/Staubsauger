@@ -13,11 +13,9 @@ class Button {
   public:
     /* Constructor
      *  
-     * @param buttonPin   Which pin the button is connected to.
+     * @param buttonPin   Which pin on the NodeMCU the button is connected to.
      */
     Button(const int buttonPin);
-    /* Reads the state of the button.
-     */
     int read();
 };
 

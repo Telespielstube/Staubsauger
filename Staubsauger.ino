@@ -20,17 +20,19 @@ char *temperature = "0.0";
 char *humidity = "0.0";
 char *PM10 = "0.0";
 char *PM25 = "0.0";
+char *error = "";
 int buttonState = HIGH;
 
 WiFiClient wifiClient;
 PubSubClient subClient(wifiClient);
 LiquidCrystal lcd(D5, D6, D1, D2, D3, D4);
-//LiquidCrystal lcd(14, 12, 5, 4, 0, 2);
 Connection connection(ssid, password, mqttServer, mqttPort, mqttUser, mqttPassword, &wifiClient, &subClient);
 Button button(buttonPin);
 Parser parser;
 Display display;
 
+/** Initializes included libraries.
+ */
 void setup() {
   lcd.begin(16, 2);
   Serial.begin(115200);
@@ -41,7 +43,12 @@ void setup() {
   subClient.setCallback(callback);
 }
 
-// Function to fetch messges from broker.
+/** Fetches newly published messges from broker. 
+ *  
+ *  @param *topic         name of the topic of the new message;
+ *  @param *payload       content of the new message.
+ *  @param messageLength  length of message.
+ */
 void callback(char *topic, byte *payload, int const messageLength) {
   lcd.clear();
   char values[9];
@@ -50,6 +57,8 @@ void callback(char *topic, byte *payload, int const messageLength) {
     values[i] = payload[i];
   }
   if ((!strcmp(topic, "/home/backyard/sds11") == 0) && (!strcmp(topic, "/home/backyard/dht11") == 0)){
+      parser.readError(values, &error);
+      display.showError(error);
       return;
   }
   if (strcmp(topic, "/home/backyard/sds11") == 0) {
@@ -68,6 +77,8 @@ void callback(char *topic, byte *payload, int const messageLength) {
   }    
 }
 
+/** loops consecutively, allowing your program to change and respond.
+ */
 void loop() {
   if (WiFi.status() != WL_CONNECTED) {
     connection.connectToWifi();
