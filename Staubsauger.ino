@@ -1,4 +1,4 @@
-/** Implements subscriber client of an MQTT infrastructure.
+/** Implements a subscriber client of an MQTT infrastructure. This client  
 */
 #include "Connection.h"
 #include "Button.h"
@@ -9,7 +9,7 @@
 #include <PubSubClient.h>
 
 int buttonPin = D0;
-char const *ssid = "iPhone";
+char const * ssid = "iPhone";
 char const *password = "mqttProject";
 char const *mqttServer = "broker.hivemq.com";
 int mqttPort = 1883;

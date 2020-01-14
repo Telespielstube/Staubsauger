@@ -33,7 +33,7 @@ class Connection {
     /* Connects publisher to the wifi network.
      */
     void connectToWifi();
-     /* Connects publisher to the brroker.
+     /* Connects publisher to the broker.
      */
     bool connectToBroker();
 };
